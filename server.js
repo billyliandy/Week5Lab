@@ -17,12 +17,12 @@ app.engine("html",require('ejs').renderFile)
 app.set("view engine","html");
 
 app.get("/",(req,res)=>{
-    res.sendFile(__dirname+"/index.html");
+    res.render("index.html");
     // res.send("Hello World")
 })
 
 app.get("/addNewTask",(req,res)=>{
-    res.sendFile(__dirname+"/addNewTask.html")
+    res.render("addNewTask.html");
 })
 
 app.post('/newTask',(req,res)=>{
