@@ -1,0 +1,32 @@
+<html>
+<head>
+    <title>
+        All Tasks
+    </title>
+</head>
+<body>
+    <h2> <a href="/index.html">Home</a> <a href="/listTask">Task List</a></h2>
+    <table class="table table-dark">
+        <thead class="thead-dark">
+
+        <tr>
+            <th>Name</th>
+            <th>Due Date</th>
+            <th>Description</th>
+        </tr>
+        <% for(let i=0;i < tasks.length;i++){%>
+            <tr>
+                <td>
+                    <%=tasks[i].name%>
+                </td>
+                <td>
+                    <%=tasks[i].dueDate%>
+                </td>
+                <td>
+                    <%=tasks[i].description%>
+                </td>
+        <% }%>
+            
+    </table>
+</body>
+</html>
