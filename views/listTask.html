@@ -5,27 +5,49 @@
     <title>
         All Tasks
     </title>
+    <style>
+            table,th,td {
+                border: 1px solid black;
+            }
+    </style>
 </head>
 <body>
-    <h2> <a href="/">Home</a> <a href="/listTask">Task List</a></h2>
-    <table class="table table-dark">
-        <thead class="thead-dark">
+    <h2> 
+        <a href="/">Home</a><br>
+        <a href="/listTask">Task List</a><br>
+        <a href="/deletetask">Delete Task</a><br>
+        <a href="/updatetask">Update Task</a><br>
+        <a href="/addNewTask">Add Task</a>             
 
+    </h2>
+    <table class="table table-dark">
         <tr>
+            <th>ID</th>
             <th>Name</th>
             <th>Due Date</th>
             <th>Description</th>
+            <th>Assign to</th>
+            <th>Status</th>
         </tr>
-        <% for(let i=0;i < tasks.length;i++){%>
+        <% for(let i=0;i < tasksDb.length;i++){%>
             <tr>
                 <td>
-                    <%=tasks[i].name%>
+                    <%=tasksDb[i]._id%>
                 </td>
                 <td>
-                    <%=tasks[i].dueDate%>
+                    <%=tasksDb[i].name%>
                 </td>
                 <td>
-                    <%=tasks[i].description%>
+                    <%=tasksDb[i].dueDate%>
+                </td>
+                <td>
+                    <%=tasksDb[i].description%>
+                </td>
+                <td>
+                    <%=tasksDb[i].assignto%>
+                </td>
+                <td>
+                    <%=tasksDb[i].status%>
                 </td>
         <% }%>
             

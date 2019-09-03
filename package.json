@@ -11,8 +11,18 @@
   "dependencies": {
     "body-parser": "^1.19.0",
     "ejs": "^2.6.2",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "mongodb": "^3.3.2",
+    "nodemon": "^1.19.1"
   },
   "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/billyliandy/Week5Lab.git"
+  },
+  "bugs": {
+    "url": "https://github.com/billyliandy/Week5Lab/issues"
+  },
+  "homepage": "https://github.com/billyliandy/Week5Lab#readme",
   "description": ""
 }
