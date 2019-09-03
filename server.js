@@ -114,6 +114,16 @@ app.post('/deletecompleted', function (req, res) {
     });
     res.redirect('/listTask');// redirect the client to list users page
 });
+
+app.post('/deleteOldComplete', function (req, res) {
+    let filter = {
+        status: "completed",
+        dueDate:{$lt:"2019-09-03"}
+    }
+    db.collection('tasks').deleteMany(filter)
+    res.redirect('/listTask');// redirect the client to list users psage
+});
+
 app.listen(3000,()=>{
     console.log('Listening on 3000')
 })
