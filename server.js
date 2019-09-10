@@ -1,26 +1,73 @@
 let express =require('express');
 let app = express();
+let mongoose=require('mongoose')
 let bodyParser=require('body-parser');
 // let viewPath= (__dirname+"/views/");
+
 var ObjectId = require('mongodb').ObjectID
+let Task = require('./models/task');
+let Developer=require('./models/developer');
+// let mongoDb=require('mongodb');
+// const MongoClient=mongoDb.MongoClient;
 
-//set up MONGO DB
-let mongoDb=require('mongodb');
-const MongoClient=mongoDb.MongoClient;
-const url = "mongodb://localhost:27017";               
-let db= null;
-let col =null;
-
-MongoClient.connect(url,{useNewUrlParser:true},function(err,client){
-    if(!err){
-        console.log('MongoDB Connected Successfully');
-        db=client.db('fit2095')
-        // col2=db.createCollection("Tasks");
-        // coll =db.collection("Tasks");
-    }else{
-        console.log('Mongo Connection Error',err);
+//Set Up Mongoose
+const url = "mongodb://localhost:27017/week7lab";               
+mongoose.connect(url , function(err,client){
+    if (err){
+        console.log('Error',err)
     }
-})
+    else{
+        console.log("Server connected")
+        app.get('/adddeveloper/:fname/:lname/:level/:state/:suburb/:street/:unit',(req,res)=>{
+            let developer= new Developer({
+                devname:{
+                    firstName:req.params.fname,
+                    lastName: req.params.lname,
+                },
+                level:req.params.level,
+                address:{
+                    state: req.params.state,
+                    suburb: req.params.suburb,
+                    street: req.params.street,
+                    unit: req.params.unit
+                }
+            })
+            developer.save(function (err) {
+                if (err){
+                    console.log(err)
+                }
+                else{
+                    console.log('Developer successfully Added to DB');
+                    // let task = new Task({
+                    //     taskname: "Study",
+                    //     assignto: developer._id,
+                    //     dueDate: Date.now,
+                    //     status: 'InProgress',
+                    //     description:'library study session'
+                    // });
+                    // task.save(function(err){
+                    //     if (err) {
+                    //         console.log("Error",err)
+                    //     }
+                    //     else{
+                    //         console.log("Task Saved !")
+                    //     }
+                    // }); 
+                }
+                res.redirect('/getdeveloper')
+        });
+    });
+    }
+    
+
+// MongoClient.connect(url,{useNewUrlParser:true},function(err,client){
+//     if(!err){
+//         console.log('MongoDB Connected Successfully');
+//         db=client.db('fit2095')
+//     }else{
+//         console.log('Mongo Connection Error',err);
+//     }
+// })
 
 
 app.use(express.static("public/img"))
@@ -41,33 +88,44 @@ app.get("/",(req,res)=>{
     // res.send("Hello World")
 })
 
+app.get("/getdeveloper",(req,res)=>{
+    Developer.find({}).populate('developer').exec((err,data)=>{
+            res.render('listdeveloper',{
+                developerDB:data
+        })
+    })
+})
+
 app.get("/addNewTask",(req,res)=>{
-    // console.log("Homepage request")
-    // col.find({}).toArray(function(err,Week6Lab){
-    //     console.log("Find query", Week6Lab)
-    // })
     res.render("addNewTask.html");
 })
 
 //ADD TASKS
 app.post('/newTask',(req,res)=>{
     let taskDetails=req.body;
-    console.log(taskDetails); 
-    db.collection('tasks').insertOne({
-        name: taskDetails.name,
-        dueDate: taskDetails.dueDate, 
-        description:taskDetails.description,
-        assignto:taskDetails.assignto,
-        status:taskDetails.taskstatus
+    let taskdeveloper = taskDetails.assignto;
+    console.log(taskDetails);
+     
+    Task.create({
+        taskname: taskDetails.name,
+        assignto: new mongoose.Types.ObjectId(taskdeveloper),
+        dueDate: taskDetails.dueDate,
+        status: taskDetails.taskstatus,
+        description:taskDetails.description
+    }, function(err){
+        if(err){
+            console.log(err)
+        }
+        else{
+            res.redirect('/listTask')
+        }
     });
-    // coll.find({}).toArray(function(err,dbTasks){
-    //     console.log("Tasks in DB",dbTasks);
-    res.redirect('/listTask');
-    })
-
+    
+    }); 
 
 app.get("/listTask",(req,res)=>{
-    db.collection('tasks').find({}).toArray(function (err,data){
+    console.log(Developer);
+    Task.find({}).exec(function (err,data){
         res.render('listTask.html',{
             tasksDb:data
         })
@@ -89,8 +147,14 @@ app.post('/updatetaskdata', function (req, res) {
     let theUpdate = { $set: { 
         status:taskDetails.taskstatusnew
     } };
-    db.collection('tasks').updateOne(filter, theUpdate);
+    Task.find().populate('task').updateOne(filter, theUpdate);
     res.redirect('/listTask');// redirect the client to list users page
+})
+//extra task
+app.get('/update-sort', function (req,res){
+    Task.where({'status':'Complete'}).limit(3).sort('taskname').exec(function(err,docs){
+        console.log(docs);
+    })
 })
 
 //Delete Task: 
@@ -100,28 +164,37 @@ app.get('/deletetask', function (req, res) {
 });
 //POST request: receive the user's name and do the delete operation 
 app.post('/deletetaskdata', function (req, res) {
-    let taskDetails = req.body;
-    let filter = { id: taskDetails._id };
-    db.collection('tasks').deleteOne(filter);
+    let taskDetails=req.body;
+    let taskId=new mongoose.Types.ObjectId(taskDetails.id)
+    
+    Task.deleteOne({ _id: taskId }, function (err, doc) {
+        console.log(doc);
+    }); 
     res.redirect('/listTask');// redirect the client to list users page
 });
 
 app.post('/deletecompleted', function (req, res) {
-    // let taskDetails = req.body;
-    // let filter = { status: taskDetails.status };
-    db.collection('tasks').deleteMany({status: "completed"}, function (err, obj){
-        
-    });
+    let taskDetails=req.body;
+    let taskId=new mongoose.Types.ObjectId(taskDetails.id)
+    Task.deleteOne({ _id: taskId }, function (err, doc) {
+        console.log(doc);
+    }); 
+    res.redirect('/listTask');// redirect the client to list users page
+    Task.deleteMany({ status : 'Complete' }, function (err, doc) {
+        console.log(doc);
+    }); 
     res.redirect('/listTask');// redirect the client to list users page
 });
 
 app.post('/deleteOldComplete', function (req, res) {
     let filter = {
-        status: "completed",
+        status: "Complete",
         dueDate:{$lt:"2019-09-03"}
     }
-    db.collection('tasks').deleteMany(filter)
+    Task.find().populate('task').deleteMany(filter)
     res.redirect('/listTask');// redirect the client to list users psage
+});
+
 });
 
 app.listen(3000,()=>{

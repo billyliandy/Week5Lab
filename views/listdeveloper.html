@@ -23,34 +23,41 @@
     <table class="table table-dark">
         <tr>
             <th>ID</th>
-            <th>Task Name</th>
-            <th>Assign to</th>
-            <th>Due Date</th>
-            <th>Status</th>
-            <th>Description</th>
-            
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Level</th>
+            <th>State</th>
+            <th>Suburb</th>
+            <th>Street</th>
+            <th>Unit</th>
+
         </tr>
-        <% for(let i=0;i < tasksDb.length;i++){%>
+        <% for(let i=0;i < developerDB.length;i++){%>
             <tr>
                 <td>
-                    <%=tasksDb[i]._id%>
+                    <%=developerDB[i]._id%>
                 </td>
                 <td>
-                    <%=tasksDb[i].taskname%>
+                    <%=developerDB[i].devname.firstName%>
                 </td>
                 <td>
-                    <%=tasksDb[i].assignto%>
+                    <%=developerDB[i].devname.lastName%>
                 </td>
                 <td>
-                    <%=tasksDb[i].dueDate%>
+                    <%=developerDB[i].level%>
                 </td>
                 <td>
-                    <%=tasksDb[i].status%>
+                    <%=developerDB[i].address.state%>
                 </td>
                 <td>
-                    <%=tasksDb[i].description%>
+                    <%=developerDB[i].address.suburb%>
                 </td>
-                
+                <td>
+                    <%=developerDB[i].address.street%>
+                </td>
+                <td>
+                    <%=developerDB[i].address.unit%>
+                </td>
         <% }%>
             
     </table>
